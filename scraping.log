@@ -67,3 +67,24 @@
 2025-10-12 16:13:14,466 - INFO - Data collection completed successfully
 2025-10-12 16:18:12,861 - INFO - Firebase initialized successfully
 2025-10-12 16:18:13,621 - INFO - Data collection completed successfully
+2025-10-12 16:30:48,157 - ERROR - Failed to initialize Firebase: [Errno 2] No such file or directory: 'hda-data-collection-a345d38189b5.json'
+2025-10-12 16:30:48,157 - ERROR - Application failed: [Errno 2] No such file or directory: 'hda-data-collection-a345d38189b5.json'
+2025-10-12 16:36:12,196 - INFO - Firebase initialized successfully
+2025-10-12 16:36:12,934 - INFO - Data collection completed successfully
+2025-10-12 16:36:57,451 - INFO - Firebase initialized successfully
+2025-10-12 16:36:58,168 - INFO - Data collection completed successfully
+2025-10-12 16:38:24,025 - INFO - Firebase initialized successfully
+2025-10-12 16:38:34,222 - INFO - Data collection completed successfully
+2025-10-12 16:42:47,134 - INFO - Firebase initialized successfully
+2025-10-12 16:42:48,131 - INFO - Data collection completed successfully
+2025-10-12 16:45:05,573 - INFO - Firebase initialized successfully
+2025-10-12 16:45:06,276 - ERROR - Error in main execution: name 'BASE_URL' is not defined
+2025-10-12 16:45:06,276 - ERROR - Application failed: name 'BASE_URL' is not defined
+2025-10-12 16:45:54,599 - INFO - Firebase initialized successfully
+2025-10-12 16:45:55,363 - ERROR - Error in main execution: name 'BASE_URL' is not defined
+2025-10-12 16:45:55,363 - ERROR - Application failed: name 'BASE_URL' is not defined
+2025-10-12 16:46:47,607 - INFO - Firebase initialized successfully
+2025-10-12 16:46:48,279 - ERROR - Error in main execution: type object 'TimeDataScraper' has no attribute 'BASE_URL'
+2025-10-12 16:46:48,280 - ERROR - Application failed: type object 'TimeDataScraper' has no attribute 'BASE_URL'
+2025-10-12 16:47:34,727 - INFO - Firebase initialized successfully
+2025-10-12 16:47:35,460 - INFO - Data collection completed successfully

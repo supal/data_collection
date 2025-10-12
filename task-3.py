@@ -11,6 +11,7 @@ import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import db
 import logging
+import re
 
 # Set up logging
 logging.basicConfig(
@@ -41,7 +42,7 @@ class TimeDataScraper:
         try:
             # Initialize Firebase with your credentials
             # You need to replace 'path/to/your/serviceAccountKey.json' with your actual Firebase credentials file
-            cred = credentials.Certificate('hda-data-collection-a345d38189b5.json')
+            cred = credentials.Certificate('hda-data-collection.json')
             firebase_admin.initialize_app(cred, {
                 'databaseURL': 'https://hda-data-collection-default-rtdb.firebaseio.com/'
             })
@@ -64,9 +65,10 @@ class TimeDataScraper:
         """Parse time and date information from the webpage"""
         try:
             data = {
+                'source': None,
                 'current_time': None,
-                'timezone': None,
-                'date': None,
+                'city': None,
+                'temperature': None,
                 'weather': None
             }
             
@@ -89,7 +91,16 @@ class TimeDataScraper:
             box_elements = soup.find_all('div', {'class': 'tad-explore-box__content'})
             if(box_elements):
                 weather = box_elements[5].find('a').get('title')
-                data['weather'] = weather
+                match = re.search(r"Weather in ([^:]+): (.+)", weather)
+                if match:
+                    city = match.group(1).strip()
+                    weather = match.group(2).strip()
+                    print("City:", city)
+                    print("Weather:", weather)
+                    data['weather'] = weather
+                    data['city'] = city
+                else:
+                    print("No match found")
 
             # Extract Temperature
             temp_element = soup.find('span', {'class': 'cur-temp nw'});
@@ -102,7 +113,6 @@ class TimeDataScraper:
             raise
 
     def save_to_local(self, data):
-<<<<<<< HEAD
         """Save data to local JSON file with updates"""
         try:
             filename = os.path.join(self.output_dir, "weather_data.json")
@@ -127,17 +137,7 @@ class TimeDataScraper:
             print(f"Data updated in {filename}")
         except Exception as e:
             print(f"Error saving to local file: {str(e)}")
-=======
-        """Save data to local file"""
-        try:
-            filename = os.path.join(self.output_dir, f"time_data_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json")
-            with open(filename, 'w', encoding='utf-8') as f:
-                json.dump(data, f, indent=4)
-            logging.info(f"Data saved locally to {filename}")
-        except Exception as e:
-            logging.error(f"Failed to save data locally: {str(e)}")
             raise
->>>>>>> refs/remotes/origin/main
 
     def save_to_firebase(self, data):
         """Save data to Firebase"""
@@ -162,9 +162,12 @@ class TimeDataScraper:
             
             # Extract data
             data = self.parse_time_data(soup)
-            
+
+            # Add source
+            data['source'] = 'https://www.timeanddate.com/'
+
             # Add timestamp
-            data['timestamp'] = datetime.now().isoformat()
+            data['current_time'] = datetime.now().isoformat()
             
             # Save data locally
             self.save_to_local(data)
