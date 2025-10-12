@@ -4,6 +4,7 @@ output/
 *.json
 *.txt
 .idea/
+*.log
 
 # Python
 __pycache__/
