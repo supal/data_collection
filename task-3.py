@@ -26,7 +26,8 @@ logging.basicConfig(
 class TimeDataScraper:
     def __init__(self):
         self.USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:65.0) Gecko/20100101 Firefox/65.0"
-        self.BASE_URL = "https://www.timeanddate.com/"
+        self.TIMEDATA_URL = "https://www.timeanddate.com/"
+        self.WEATHER_URL = "https://weather.com"
         self.headers = {"user-agent": self.USER_AGENT}
         
         # Create output directory if it doesn't exist
@@ -61,7 +62,7 @@ class TimeDataScraper:
             logging.error(f"Failed to fetch webpage: {str(e)}")
             raise
 
-    def parse_time_data(self, soup):
+    def parse_time_and_date(self, soup):
         """Parse time and date information from the webpage"""
         try:
             data = {
@@ -71,23 +72,8 @@ class TimeDataScraper:
                 'temperature': None,
                 'weather': None
             }
-            
-            # Extract current time
-            time_element = soup.find('span', {'id': 'ct'})
-            if time_element:
-                data['current_time'] = time_element.text.strip()
 
-            # Extract timezone
-            timezone_element = soup.find('span', {'id': 'ctz'})
-            if timezone_element:
-                data['timezone'] = timezone_element.text.strip()
-
-            # Extract current date
-            date_element = soup.find('span', {'id': 'cd'})
-            if date_element:
-                data['date'] = date_element.text.strip()
-
-            # Extract Weather
+            # Extract City and Weather
             box_elements = soup.find_all('div', {'class': 'tad-explore-box__content'})
             if(box_elements):
                 weather = box_elements[5].find('a').get('title')
@@ -106,6 +92,35 @@ class TimeDataScraper:
             temp_element = soup.find('span', {'class': 'cur-temp nw'});
             if temp_element:
                 data['temperature'] = temp_element.text.strip()
+
+            return data
+        except Exception as e:
+            logging.error(f"Failed to parse time data: {str(e)}")
+            raise
+
+    def parse_weather(self, soup):
+        """Parse time and date information from the webpage"""
+        try:
+            data = {
+                'source': None,
+                'current_time': None,
+                'city': None,
+                'temperature': None,
+                'weather': None
+            }
+
+
+            cities_element = soup.find_all('h1', {'class': 'CurrentConditions--location--yub4l'})
+            if(cities_element):
+                city_element = cities_element[0]
+                if city_element:
+                    data['city'] = city_element.text.strip()
+
+            temperature_element = soup.find_all('span', {'class': 'CurrentConditions--tempValue--zUBSz'})[0]
+            data['temperature'] = temperature_element.text.strip()
+
+            weather_element = soup.find_all('div', {'class': 'CurrentConditions--phraseValue---VS-k'})[0]
+            data['weather'] = weather_element.text.strip()
 
             return data
         except Exception as e:
@@ -155,16 +170,16 @@ class TimeDataScraper:
         """Main execution method"""
         try:
             # Fetch webpage
-            response = self.fetch_webpage(self.BASE_URL)
+            response = self.fetch_webpage(self.TIMEDATA_URL)
             
             # Parse HTML
             soup = BeautifulSoup(response.content, "html.parser")
             
             # Extract data
-            data = self.parse_time_data(soup)
+            data = self.parse_time_and_date(soup)
 
             # Add source
-            data['source'] = 'https://www.timeanddate.com/'
+            data['source'] = self.TIMEDATA_URL
 
             # Add timestamp
             data['current_time'] = datetime.now().isoformat()
@@ -173,8 +188,29 @@ class TimeDataScraper:
             self.save_to_local(data)
             
             # Save data to Firebase
-            # self.save_to_firebase(data)
-            
+            self.save_to_firebase(data)
+
+            # Fetch webpage
+            response = self.fetch_webpage(self.WEATHER_URL)
+
+            # Parse HTML
+            soup = BeautifulSoup(response.content, "html.parser")
+
+            # Extract data
+            data = self.parse_weather(soup)
+
+            # Add source
+            data['source'] = self.WEATHER_URL
+
+            # Add timestamp
+            data['current_time'] = datetime.now().isoformat()
+
+            # Save data locally
+            self.save_to_local(data)
+
+            # Save data to Firebase
+            self.save_to_firebase(data)
+
             logging.info("Data collection completed successfully")
             return data
             
