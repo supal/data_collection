@@ -102,6 +102,7 @@ class TimeDataScraper:
             raise
 
     def save_to_local(self, data):
+<<<<<<< HEAD
         """Save data to local JSON file with updates"""
         try:
             filename = os.path.join(self.output_dir, "weather_data.json")
@@ -126,6 +127,17 @@ class TimeDataScraper:
             print(f"Data updated in {filename}")
         except Exception as e:
             print(f"Error saving to local file: {str(e)}")
+=======
+        """Save data to local file"""
+        try:
+            filename = os.path.join(self.output_dir, f"time_data_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json")
+            with open(filename, 'w', encoding='utf-8') as f:
+                json.dump(data, f, indent=4)
+            logging.info(f"Data saved locally to {filename}")
+        except Exception as e:
+            logging.error(f"Failed to save data locally: {str(e)}")
+            raise
+>>>>>>> refs/remotes/origin/main
 
     def save_to_firebase(self, data):
         """Save data to Firebase"""
